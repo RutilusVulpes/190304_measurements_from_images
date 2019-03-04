@@ -79,6 +79,24 @@ class Camera(object):
         resid = resid.flatten()
         return resid
 def main(argv):
+    if(len(argv) < 1):
+        print("Please submit as arguments GCPs 1")
+        return
+    gcps  = open(argv[0], "r")
+    obs = []
+    true = []
+
+    for line in gcps:
+        line = line.strip("\n")
+        line = line.split(",")
+        if(len(line) > 1):
+            true.append([float(line[0]),float(line[1])])
+            obs.append([float(line[2]),float(line[3]),float(line[4])])
+
+    true = np.asarray(true)
+    obs = np.asarray(obs)
+    print(true)
+    print(obs)
     FOCAL_LENGTH = 2448
     SENSOR_X = 3264
     SENSOR_Y = 2448
@@ -89,20 +107,10 @@ def main(argv):
 
     cam = Camera(p_0,f,c)
 
-    obs = np.array([[272558.68, 5193938.07, 1015.,1],
-                  [272572.34, 5193981.03, 982.,1],
-                  [273171.31, 5193846.77, 1182.,1],
-                  [273183.35, 5194045.24, 1137.,1],
-                  [272556.74, 5193922.02, 998.,1]])
-
-    true = np.array([[1984., 1053.],
-                      [884., 1854.],
-                      [1202., 1087.],
-                      [385., 1190.],
-                      [2350., 1442.]])
-
     p_opt = cam.estimate_pose(obs,true,p_0)
+
     print(p_opt)
+
     for GCP in obs:
         print(cam.rotational_transform(GCP,p_opt))
 
